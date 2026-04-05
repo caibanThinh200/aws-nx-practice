@@ -1,0 +1,65 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/api/**'
+      - '.github/workflows/deploy-prod.yml'
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.get-url.outputs.api_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to Production
+        working-directory: packages/api
+        run: |
+          npx serverless deploy \
+            --stage prod \
+            --region ${{ env.AWS_REGION }} \
+            --verbose
+
+      - name: Get API URL
+        id: get-url
+        working-directory: packages/api
+        run: |
+          API_URL=$(npx serverless info \
+            --stage prod \
+            --region ${{ env.AWS_REGION }} \
+            | grep "endpoint:" | awk '{print $2}')
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+
+      - name: Create deployment summary
+        run: |
+          echo "## ✅ Production Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**API URL**: ${{ steps.get-url.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Region**: ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Stage**: prod" >> $GITHUB_STEP_SUMMARY

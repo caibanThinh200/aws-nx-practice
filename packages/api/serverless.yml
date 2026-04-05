@@ -1,0 +1,135 @@
+service: org-api
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  stackName: ${self:service}-${self:provider.stage}
+
+  # CloudFormation stack tags
+  stackTags:
+    Project: org-monorepo
+    ManagedBy: serverless
+    Environment: ${self:provider.stage}
+
+  # IAM permissions for Lambda functions
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - !GetAtt ItemsTable.Arn
+
+  # Environment variables for all functions
+  environment:
+    ITEMS_TABLE: !Ref ItemsTable
+    STAGE: ${self:provider.stage}
+
+functions:
+  listItems:
+    handler: src/functions/items/list.handler
+    events:
+      - httpApi:
+          path: /api/items
+          method: get
+
+  getItem:
+    handler: src/functions/items/get.handler
+    events:
+      - httpApi:
+          path: /api/items/{id}
+          method: get
+
+  createItem:
+    handler: src/functions/items/create.handler
+    events:
+      - httpApi:
+          path: /api/items
+          method: post
+
+  updateItem:
+    handler: src/functions/items/update.handler
+    events:
+      - httpApi:
+          path: /api/items/{id}
+          method: put
+
+  deleteItem:
+    handler: src/functions/items/delete.handler
+    events:
+      - httpApi:
+          path: /api/items/{id}
+          method: delete
+
+# CloudFormation Resources
+resources:
+  Resources:
+    # DynamoDB Table
+    ItemsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-items-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+
+    # API Gateway Response for CORS
+    HttpApiDefaultStage:
+      Type: AWS::ApiGatewayV2::Stage
+      Properties:
+        StageName: $default
+        ApiId: !Ref HttpApi
+        AutoDeploy: true
+        DefaultRouteSettings:
+          ThrottlingBurstLimit: 100
+          ThrottlingRateLimit: 50
+
+  # CloudFormation Outputs
+  Outputs:
+    ApiUrl:
+      Description: API Gateway endpoint URL
+      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+      Export:
+        Name: ${self:service}-${self:provider.stage}-api-url
+
+    ItemsTableName:
+      Description: DynamoDB table name
+      Value: !Ref ItemsTable
+      Export:
+        Name: ${self:service}-${self:provider.stage}-items-table
+
+plugins:
+  - serverless-offline
+
+build:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: ['aws-sdk']
+    target: 'node20'
+    platform: 'node'
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    websocketPort: 3001
+    lambdaPort: 3002
+    noPrependStageInUrl: true

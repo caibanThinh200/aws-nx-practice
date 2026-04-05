@@ -1,0 +1,6 @@
+{
+  "watch": ["src/**/*.ts"],
+  "ext": "ts,yml",
+  "exec": "serverless offline start",
+  "delay": "1000"
+}

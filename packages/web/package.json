@@ -1,0 +1,12 @@
+{
+  "name": "@org/web",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@org/shared": "*",
+    "axios": "*"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2"
+  }
+}
