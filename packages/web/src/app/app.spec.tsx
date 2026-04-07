@@ -11,7 +11,7 @@ describe('App', () => {
   it('should have a greeting as the title', () => {
     const { getAllByText } = render(<App />);
     expect(
-      getAllByText(new RegExp('Welcome @org/web', 'gi')).length > 0
+      getAllByText('Item Manager').length > 0
     ).toBeTruthy();
   });
 });
