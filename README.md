@@ -78,14 +78,29 @@ npm install --legacy-peer-deps
 ### Start Both Services (Recommended)
 
 ```bash
-# Terminal 1: Start API (serverless-offline on port 3000)
-npx nx serve api
-
-# Terminal 2: Start Web (Vite dev server on port 4200)
-npx nx serve web
+# One command to start both API and Web servers
+npm run dev
 ```
 
+This will start:
+- **API** (serverless-offline on port 3000) with blue prefix
+- **Web** (Vite dev server on port 4200) with green prefix
+
 Then open http://localhost:4200 in your browser. The frontend will proxy API requests to the backend.
+
+### Start Services Individually
+
+```bash
+# Terminal 1: Start API only
+npm run dev:api
+# or
+npx nx serve api
+
+# Terminal 2: Start Web only
+npm run dev:web
+# or
+npx nx serve web
+```
 
 ### Individual Commands
 

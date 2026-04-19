@@ -46,12 +46,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const data: UpdateItemDto = JSON.parse(event.body);
 
     // Check if item exists
-    const getCommand = new GetCommand({
-      TableName: TABLE_NAME,
-      Key: { id },
-    });
-
-    const existingItem = await docClient.send(getCommand);
+    const existingItem = await db.get(TABLE_NAME, { id });
 
     if (!existingItem.Item) {
       return {
@@ -88,16 +83,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
     expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    const updateCommand = new UpdateCommand({
-      TableName: TABLE_NAME,
-      Key: { id },
-      UpdateExpression: `SET ${updateExpressions.join(', ')}`,
-      ExpressionAttributeNames: expressionAttributeNames,
-      ExpressionAttributeValues: expressionAttributeValues,
-      ReturnValues: 'ALL_NEW',
-    });
-
-    const response = await docClient.send(updateCommand);
+    const response = await db.update(
+      TABLE_NAME,
+      { id },
+      `SET ${updateExpressions.join(', ')}`,
+      expressionAttributeNames,
+      expressionAttributeValues
+    );
 
     return {
       statusCode: 200,

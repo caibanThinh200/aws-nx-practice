@@ -42,6 +42,7 @@ testem.log
 # Serverless
 .serverless/
 .serverless_plugins/
+.store/
 
 # System Files
 .DS_Store

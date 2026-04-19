@@ -68,13 +68,22 @@ This monorepo is now fully configured with a production-ready serverless CRUD ap
 
 ### Start Development
 ```bash
-# Terminal 1: API (port 3000)
-npx nx serve api
+# Start both API and Web with one command
+npm run dev
 
-# Terminal 2: Web (port 4200)
-npx nx serve web
+# Or start individually:
+npm run dev:api   # API only (port 3000)
+npm run dev:web   # Web only (port 4200)
 
 # Open: http://localhost:4200
+```
+
+### Available Scripts
+```bash
+npm run dev       # Start both services (recommended)
+npm start         # Alias for npm run dev
+npm run dev:api   # Start API only
+npm run dev:web   # Start Web only
 ```
 
 ### Deploy

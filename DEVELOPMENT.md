@@ -28,32 +28,45 @@ Note: We use `--legacy-peer-deps` due to peer dependency conflicts between Vite 
 
 ## Running the Application
 
-### Option 1: Both Services Together
+### Option 1: Both Services Together (Recommended)
+
+```bash
+npm run dev
+```
+
+This single command starts both:
+- **API** (serverless-offline with nodemon on port 3000) - shown with blue prefix
+- **Web** (Vite dev server on port 4200) - shown with green prefix
+
+The output is color-coded and prefixed for easy identification. Press `Ctrl+C` to stop both services.
+
+### Option 2: Individual Services
 
 Open two terminal windows:
 
 **Terminal 1 - API:**
-
 ```bash
+npm run dev:api
+# or
 npx nx serve api
 ```
-
 This starts serverless-offline with nodemon for hot reload on port 3000.
 
 **Terminal 2 - Web:**
-
 ```bash
+npm run dev:web
+# or
 npx nx serve web
 ```
-
 This starts the Vite dev server on port 4200.
 
 Then navigate to: http://localhost:4200
 
-### Option 2: Individual Services
+### Option 3: Package-Level Commands
+
+From within the package directories:
 
 **API only:**
-
 ```bash
 cd packages/api
 npm run dev          # With nodemon hot reload
@@ -62,9 +75,9 @@ npm run offline      # Without hot reload
 ```
 
 **Web only:**
-
 ```bash
-npx nx serve web
+cd packages/web
+npm run dev          # Vite dev server
 ```
 
 ---

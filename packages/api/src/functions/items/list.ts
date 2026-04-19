@@ -1,19 +1,12 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { Item } from '@org/shared';
+import { db } from '../../utils/db';
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
-const TABLE_NAME = process.env.ITEMS_TABLE || '';
+const TABLE_NAME = process.env.ITEMS_TABLE || 'items-local';
 
 export const handler: APIGatewayProxyHandler = async () => {
   try {
-    const command = new ScanCommand({
-      TableName: TABLE_NAME,
-    });
-
-    const response = await docClient.send(command);
+    const response = await db.scan(TABLE_NAME);
     const items = (response.Items || []) as Item[];
 
     return {

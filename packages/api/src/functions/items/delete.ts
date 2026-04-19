@@ -1,14 +1,7 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import {
-  DynamoDBDocumentClient,
-  DeleteCommand,
-  GetCommand,
-} from '@aws-sdk/lib-dynamodb';
+import { db } from '../../utils/db';
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
-const TABLE_NAME = process.env.ITEMS_TABLE || '';
+const TABLE_NAME = process.env.ITEMS_TABLE || 'items-local';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -29,12 +22,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     // Check if item exists
-    const getCommand = new GetCommand({
-      TableName: TABLE_NAME,
-      Key: { id },
-    });
-
-    const existingItem = await docClient.send(getCommand);
+    const existingItem = await db.get(TABLE_NAME, { id });
 
     if (!existingItem.Item) {
       return {
@@ -50,12 +38,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       };
     }
 
-    const deleteCommand = new DeleteCommand({
-      TableName: TABLE_NAME,
-      Key: { id },
-    });
-
-    await docClient.send(deleteCommand);
+    await db.delete(TABLE_NAME, { id });
 
     return {
       statusCode: 200,

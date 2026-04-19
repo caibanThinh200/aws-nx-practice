@@ -1,12 +1,9 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { CreateItemDto, Item } from '@org/shared';
 import { randomUUID } from 'crypto';
+import { db } from '../../utils/db';
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
-const TABLE_NAME = process.env.ITEMS_TABLE || '';
+const TABLE_NAME = process.env.ITEMS_TABLE || 'items-local';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
@@ -49,12 +46,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       updatedAt: now,
     };
 
-    const command = new PutCommand({
-      TableName: TABLE_NAME,
-      Item: item,
-    });
-
-    await docClient.send(command);
+    await db.put(TABLE_NAME, item);
 
     return {
       statusCode: 201,

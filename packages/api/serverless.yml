@@ -123,9 +123,10 @@ build:
     bundle: true
     minify: false
     sourcemap: true
-    exclude: ['aws-sdk']
-    target: 'node20'
-    platform: 'node'
+    external:
+      - 'aws-sdk'
+      - '@aws-sdk/client-dynamodb'
+      - '@aws-sdk/lib-dynamodb'
 
 custom:
   serverless-offline:
@@ -133,3 +134,9 @@ custom:
     websocketPort: 3001
     lambdaPort: 3002
     noPrependStageInUrl: true
+    # CRITICAL: Run all Lambda functions in the same process to share memory
+    useSeparateProcesses: false
+    # Use in-memory for local development (no DynamoDB local needed)
+    resourceRoutes: true
+    # Disable CloudFormation resources validation for offline
+    ignoreJWTSignature: true

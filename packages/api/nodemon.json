@@ -1,6 +1,10 @@
 {
-  "watch": ["src/**/*.ts"],
+  "watch": ["src/**/*.ts", "serverless.yml"],
   "ext": "ts,yml",
-  "exec": "serverless offline start",
-  "delay": "1000"
+  "exec": "IS_OFFLINE=true serverless offline start",
+  "delay": "1000",
+  "env": {
+    "IS_OFFLINE": "true",
+    "NODE_ENV": "development"
+  }
 }
