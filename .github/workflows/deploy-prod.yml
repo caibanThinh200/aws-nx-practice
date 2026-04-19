@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to Production
         working-directory: packages/api
         run: |
-          npx serverless deploy \
+          npx serverless@3 deploy \
             --stage prod \
             --region ${{ env.AWS_REGION }} \
             --verbose
@@ -50,7 +50,7 @@ jobs:
         id: get-url
         working-directory: packages/api
         run: |
-          API_URL=$(npx serverless info \
+          API_URL=$(npx serverless@3 info \
             --stage prod \
             --region ${{ env.AWS_REGION }} \
             | grep "endpoint:" | awk '{print $2}')
