@@ -1,14 +1,7 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import {
-  DynamoDBDocumentClient,
-  GetCommand,
-  UpdateCommand,
-} from '@aws-sdk/lib-dynamodb';
 import { UpdateItemDto, Item } from '@org/shared';
+import { db } from '../../utils/db';
 
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
 const TABLE_NAME = process.env.ITEMS_TABLE || '';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
