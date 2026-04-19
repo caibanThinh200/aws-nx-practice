@@ -15,7 +15,7 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: development
       url: ${{ steps.get-url.outputs.api_url }}
 
     steps:
