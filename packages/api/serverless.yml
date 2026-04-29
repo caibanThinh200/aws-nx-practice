@@ -91,15 +91,15 @@ resources:
             Value: ${self:provider.stage}
 
     # API Gateway Response for CORS
-    HttpApiDefaultStage:
-      Type: AWS::ApiGatewayV2::Stage
-      Properties:
-        StageName: $default
-        ApiId: !Ref HttpApi
-        AutoDeploy: true
-        DefaultRouteSettings:
-          ThrottlingBurstLimit: 100
-          ThrottlingRateLimit: 50
+    # HttpApiDefaultStage:
+    #   Type: AWS::ApiGatewayV2::Stage
+    #   Properties:
+    #     StageName: $default
+    #     ApiId: !Ref HttpApi
+    #     AutoDeploy: true
+    #     DefaultRouteSettings:
+    #       ThrottlingBurstLimit: 100
+    #       ThrottlingRateLimit: 50
 
   # CloudFormation Outputs
   Outputs:
@@ -134,8 +134,6 @@ custom:
     websocketPort: 3001
     lambdaPort: 3002
     noPrependStageInUrl: true
-    # CRITICAL: Run all Lambda functions in the same process to share memory
-    useSeparateProcesses: false
     # Use in-memory for local development (no DynamoDB local needed)
     resourceRoutes: true
     # Disable CloudFormation resources validation for offline
